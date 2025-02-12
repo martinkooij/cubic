@@ -26,11 +26,11 @@ fn main() {
     const NO_ROUGH_POINTS_PER_SEC: i32 = 1;
     const _MAX_VELOCITY: f64 = 5.0;
     const MAX_ACCELERATION: f64 = 2.0;
-    const SLOPE_UP_TIME_SEC: f64 = 2.5;
+    const SLOPE_UP_TIME_SEC: f64 = 2.0;
     const ACCELERATION_UP: f64 = MAX_ACCELERATION;
-    const FLAT_TIME_SEC: f64 = 5.0;
+    const FLAT_TIME_SEC: f64 = 6.0;
     const ACCELERATION_DOWN: f64 = -MAX_ACCELERATION;
-    const _SLOPE_DOWN_TIME_SEC: f64 = 2.5;
+    const _SLOPE_DOWN_TIME_SEC: f64 = 2.0;
     const TOTAL_SEC: i32 = 10;
     const NO_MAIN_POINTS: i32 = TOTAL_SEC * NO_ROUGH_POINTS_PER_SEC;
     const NO_TOTAL_POINTS: i32 = TOTAL_SEC * NO_DETAILED_POINTS_PER_SEC;
@@ -82,7 +82,7 @@ fn main() {
                 ACCELERATION_UP
                 * 
                 (tick as f64 / points_per_sec as f64)
-        } else if tick <= convert_toint32((SLOPE_UP_TIME_SEC as i32 + FLAT_TIME_SEC as i32)  * points_per_sec) {
+        } else if tick <= convert_toint32((SLOPE_UP_TIME_SEC as i32 +FLAT_TIME_SEC as i32)  * points_per_sec) {
             ACCELERATION_UP * SLOPE_UP_TIME_SEC
         } else {
             ACCELERATION_UP * SLOPE_UP_TIME_SEC
