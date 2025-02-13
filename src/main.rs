@@ -12,6 +12,10 @@ fn convert_toint32(val: impl TryInto<i32>) -> i32 {
     val
 }
 
+fn chop_to_integer(val: f64) -> i32 {
+    val as i32
+}
+
 fn convert_tousize(val: impl TryInto<usize>) -> usize {
     // use try_into trait method
     let val: usize = match val.try_into() {
@@ -45,19 +49,19 @@ fn main() {
         acceleration: f64,
     }
 
-    fn calculate_position(tick: i32, points_per_sec: i32) -> f64 {
-        if tick <= convert_toint32(SLOPE_UP_TIME_SEC as i32  * points_per_sec) {
+    fn calculate_position(tick: i32) -> f64 {
+        if tick <= chop_to_integer(SLOPE_UP_TIME_SEC * NO_DETAILED_POINTS_PER_SEC as f64) {
             0.5
                 * ACCELERATION_UP
-                * (tick as f64 / points_per_sec as f64)
-                * (tick as f64 / points_per_sec as f64)
-        } else if tick <= convert_toint32((SLOPE_UP_TIME_SEC as i32 +FLAT_TIME_SEC as i32)  * points_per_sec) {
+                * (tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64)
+                * (tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64)
+        } else if tick <= chop_to_integer((SLOPE_UP_TIME_SEC +FLAT_TIME_SEC)  * NO_DETAILED_POINTS_PER_SEC as f64) {
             (0.5
             * ACCELERATION_UP
             * SLOPE_UP_TIME_SEC
             * SLOPE_UP_TIME_SEC) 
             +
-            ((ACCELERATION_UP * SLOPE_UP_TIME_SEC)*((tick as f64 / points_per_sec as f64) - SLOPE_UP_TIME_SEC))
+            ((ACCELERATION_UP * SLOPE_UP_TIME_SEC)*((tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64) - SLOPE_UP_TIME_SEC))
         } else {
             (0.5
                 * ACCELERATION_UP
@@ -68,33 +72,33 @@ fn main() {
             +
             (ACCELERATION_UP * SLOPE_UP_TIME_SEC)
                  *
-            ((tick as f64 / points_per_sec as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
+            ((tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
             +
             0.5
                 * ACCELERATION_DOWN
-                * ((tick as f64 / points_per_sec as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
-                * ((tick as f64 / points_per_sec as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
+                * ((tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
+                * ((tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
             }
     }
 
-    fn calculate_velocity (tick: i32, points_per_sec: i32) -> f64 {
-        if tick <= convert_toint32(SLOPE_UP_TIME_SEC as i32  * points_per_sec) {
+    fn calculate_velocity (tick: i32) -> f64 {
+        if tick <= chop_to_integer(SLOPE_UP_TIME_SEC * NO_DETAILED_POINTS_PER_SEC as f64) {
                 ACCELERATION_UP
                 * 
-                (tick as f64 / points_per_sec as f64)
-        } else if tick <= convert_toint32((SLOPE_UP_TIME_SEC as i32 + FLAT_TIME_SEC as i32)  * points_per_sec) {
+                (tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64)
+        } else if tick <= chop_to_integer((SLOPE_UP_TIME_SEC +FLAT_TIME_SEC)  * NO_DETAILED_POINTS_PER_SEC as f64) {
             ACCELERATION_UP * SLOPE_UP_TIME_SEC
         } else {
             ACCELERATION_UP * SLOPE_UP_TIME_SEC
             +
-            ACCELERATION_DOWN * ((tick as f64 / points_per_sec as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
+            ACCELERATION_DOWN * ((tick as f64 / NO_DETAILED_POINTS_PER_SEC as f64) - (SLOPE_UP_TIME_SEC + FLAT_TIME_SEC))
         }
     }
 
-    fn calculate_acceleration (tick: i32, points_per_sec: i32) -> f64 {
-        if tick <= convert_toint32(SLOPE_UP_TIME_SEC as i32  * points_per_sec) {
+    fn calculate_acceleration (tick: i32) -> f64 {
+        if tick <= chop_to_integer(SLOPE_UP_TIME_SEC * NO_DETAILED_POINTS_PER_SEC as f64) {
             ACCELERATION_UP
-        } else if tick <= convert_toint32((SLOPE_UP_TIME_SEC as i32 +FLAT_TIME_SEC as i32)  * points_per_sec) {
+        } else if tick <= chop_to_integer((SLOPE_UP_TIME_SEC +FLAT_TIME_SEC)  * NO_DETAILED_POINTS_PER_SEC as f64) {
             0.0
         } else {
             ACCELERATION_DOWN 
@@ -123,17 +127,17 @@ fn main() {
     
     
     for i in 0..NO_MAIN_POINTS+1 {
-        pvtpoints[i as usize].tick = convert_toint32(i);
-        pvtpoints[i as usize].position = calculate_position(i, NO_ROUGH_POINTS_PER_SEC);
-        pvtpoints[i as usize].velocity = calculate_velocity(i,NO_ROUGH_POINTS_PER_SEC);
-        pvtpoints[i as usize].acceleration = calculate_acceleration(i,NO_ROUGH_POINTS_PER_SEC);
+        pvtpoints[i as usize].tick = convert_toint32(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
+        pvtpoints[i as usize].position = calculate_position(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
+        pvtpoints[i as usize].velocity = calculate_velocity(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
+        pvtpoints[i as usize].acceleration = calculate_acceleration(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
     }
 
     for i in 0..NO_TOTAL_POINTS+1 {
         allpoints[i as usize].tick = convert_toint32(i);
-        allpoints[i as usize].position = calculate_position(i,NO_DETAILED_POINTS_PER_SEC);
-        allpoints[i as usize].velocity = calculate_velocity(i, NO_DETAILED_POINTS_PER_SEC);
-        allpoints[i as usize].acceleration = calculate_acceleration(i,NO_DETAILED_POINTS_PER_SEC);
+        allpoints[i as usize].position = calculate_position(i);
+        allpoints[i as usize].velocity = calculate_velocity(i);
+        allpoints[i as usize].acceleration = calculate_acceleration(i);
     }
     
     writeln!(file, "tick,position,velocity,acceleration,dpos,dvel,dacc").expect("write failed");
