@@ -46,7 +46,7 @@ struct Args {
 }
 
 fn main() {
-    const NO_DETAILED_POINTS_PER_SEC: i32 = 40;
+    const NO_DETAILED_POINTS_PER_SEC: i32 = 100;
     const NO_ROUGH_POINTS_PER_SEC: i32 = 1;
     const _MAX_VELOCITY: f64 = 5.0;
     const MAX_ACCELERATION: f64 = 2.0;
@@ -144,7 +144,7 @@ fn main() {
             Movepoint {
                 tick,
                 position: a*t*t*t + b*t*t + c*t + d,
-                velocity: 3.0*a*t*t*t + 2.0*b*t + c,
+                velocity: 3.0*a*t*t + 2.0*b*t + c,
                 acceleration: 6.0*a*t + 2.0*b,
             }
         }
@@ -178,13 +178,13 @@ fn main() {
     
     
     for i in 0..NO_MAIN_POINTS+1 {
-        pvtpoints[i as usize].tick = convert_toint32(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
+        pvtpoints[i as usize].tick = i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC);
         pvtpoints[i as usize].position = calculate_position(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
         pvtpoints[i as usize].velocity = calculate_velocity(i*(NO_DETAILED_POINTS_PER_SEC/NO_ROUGH_POINTS_PER_SEC));
     }
 
     for i in 0..NO_TOTAL_POINTS+1 {
-        allpoints[i as usize].tick = convert_toint32(i);
+        allpoints[i as usize].tick = i;
         allpoints[i as usize].position = calculate_position(i);
         allpoints[i as usize].velocity = calculate_velocity(i);
         allpoints[i as usize].acceleration = calculate_acceleration(i);
